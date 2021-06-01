@@ -1,7 +1,7 @@
 # Game Of Life
 Conway's game of life in rust and SFML.
 
-*Gosper's glider gun*
+*Gosper's glider gun*  
 ![](showcase.gif)
 
 ## Commands
