@@ -31,7 +31,7 @@ fn main() {
     let mut framerate: f32 = 14.;
 
     loop {
-        window.clear(Color::WHITE);
+        window.clear(Color::rgb(241, 250, 238));
         while let Some(event) = window.poll_event() {
             match event {
                 Event::Closed
@@ -76,11 +76,11 @@ fn main() {
                 match cells[row][col] {
                     State::Alive => {
                         let mut rect = RectangleShape::default();
-                        rect.set_size(Vector2f::new((CELL_SIZE - 2) as f32, (CELL_SIZE - 2) as f32));
+                        rect.set_size(Vector2f::new(CELL_SIZE as f32 - 2., CELL_SIZE as f32 - 2.));
                         rect.set_position(((col * CELL_SIZE) as f32, (row * CELL_SIZE) as f32));
-                        rect.set_fill_color(Color::rgb(238, 244, 255));
+                        rect.set_fill_color(Color::rgb(168, 218, 220));
                         rect.set_outline_thickness(2.);
-                        rect.set_outline_color(Color::rgb(223, 236, 255));
+                        rect.set_outline_color(Color::rgb(69, 123, 157));
                         window.draw(&rect);
                     }
                     State::Dead => {}
