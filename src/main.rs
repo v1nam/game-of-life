@@ -1,16 +1,14 @@
 use sfml::{
-    graphics::{Color, RectangleShape, RenderStates, RenderTarget, RenderWindow, Transformable, Shape},
+    graphics::{Color, RectangleShape, RenderTarget, RenderWindow, Shape, Transformable},
     system::Vector2f,
     window::{mouse, Event, Key, Style},
 };
-use std::{ops::Not, thread, time};
 
 #[derive(Copy, Clone)]
 enum State {
     Dead,
     Alive,
 }
-
 
 const WIN_W: usize = 800;
 const WIN_H: usize = 600;
@@ -20,7 +18,7 @@ type Cells = [[State; WIN_W / CELL_SIZE]; WIN_H / CELL_SIZE];
 fn main() {
     let mut window = RenderWindow::new(
         (WIN_W as u32, WIN_H as u32),
-        "Custom shape",
+        "Game Of Life",
         Style::CLOSE,
         &Default::default(),
     );
@@ -44,14 +42,14 @@ fn main() {
                     paused = !paused;
                     framerate = 14.;
                 }
-                Event::KeyPressed {
-                    code: Key::X, ..
-                } => {
+                Event::KeyPressed { code: Key::X, .. } => {
                     cells = [[State::Dead; WIN_W / CELL_SIZE]; WIN_H / CELL_SIZE];
                 }
                 Event::MouseWheelScrolled { delta, .. } => {
                     if !paused {
-                        if framerate + delta > 12. && framerate + delta < 80. { framerate += delta; } 
+                        if framerate + delta > 12. && framerate + delta < 80. {
+                            framerate += delta;
+                        }
                     }
                 }
                 _ => {}
@@ -61,7 +59,10 @@ fn main() {
         if window.has_focus() {
             let pos = window.mouse_position();
             if (pos.y as usize) < WIN_H && (pos.x as usize) < WIN_W {
-                let (y, x) = ((pos.y / CELL_SIZE as i32) as usize, (pos.x / CELL_SIZE as i32) as usize);
+                let (y, x) = (
+                    (pos.y / CELL_SIZE as i32) as usize,
+                    (pos.x / CELL_SIZE as i32) as usize,
+                );
                 if mouse::Button::LEFT.is_pressed() {
                     cells[y][x] = State::Alive;
                 } else if mouse::Button::RIGHT.is_pressed() {
