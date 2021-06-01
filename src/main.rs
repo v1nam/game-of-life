@@ -1,5 +1,5 @@
 use sfml::{
-    graphics::{Color, RectangleShape, RenderStates, RenderTarget, RenderWindow, Transformable},
+    graphics::{Color, RectangleShape, RenderStates, RenderTarget, RenderWindow, Transformable, Shape},
     system::Vector2f,
     window::{mouse, Event, Key, Style},
 };
@@ -11,21 +11,11 @@ enum State {
     Alive,
 }
 
-impl Not for State {
-    // just for the funsies
-    type Output = Self;
-
-    fn not(self) -> Self::Output {
-        match self {
-            State::Dead => State::Alive,
-            State::Alive => State::Dead,
-        }
-    }
-}
 
 const WIN_W: usize = 800;
 const WIN_H: usize = 600;
-type Cells = [[State; WIN_W / 8]; WIN_H / 8];
+const CELL_SIZE: usize = 10;
+type Cells = [[State; WIN_W / CELL_SIZE]; WIN_H / CELL_SIZE];
 
 fn main() {
     let mut window = RenderWindow::new(
@@ -36,11 +26,12 @@ fn main() {
     );
     window.set_vertical_sync_enabled(true);
 
-    let mut cells: Cells = [[State::Dead; WIN_W / 8]; WIN_H / 8];
+    let mut cells: Cells = [[State::Dead; WIN_W / CELL_SIZE]; WIN_H / CELL_SIZE];
     let mut paused = true;
+    let mut framerate: f32 = 14.;
 
     loop {
-        window.clear(Color::BLACK);
+        window.clear(Color::WHITE);
         while let Some(event) = window.poll_event() {
             match event {
                 Event::Closed
@@ -51,6 +42,12 @@ fn main() {
                     code: Key::SPACE, ..
                 } => {
                     paused = !paused;
+                    framerate = 14.;
+                }
+                Event::MouseWheelScrolled { delta, .. } => {
+                    if !paused {
+                        if framerate + delta > 12. && framerate + delta < 80. { framerate += delta; } 
+                    }
                 }
                 _ => {}
             }
@@ -59,7 +56,7 @@ fn main() {
         if window.has_focus() {
             let pos = window.mouse_position();
             if (pos.y as usize) < WIN_H && (pos.x as usize) < WIN_W {
-                let (y, x) = ((pos.y / 8) as usize, (pos.x / 8) as usize);
+                let (y, x) = ((pos.y / CELL_SIZE as i32) as usize, (pos.x / CELL_SIZE as i32) as usize);
                 if mouse::Button::LEFT.is_pressed() {
                     cells[y][x] = State::Alive;
                 } else if mouse::Button::RIGHT.is_pressed() {
@@ -70,6 +67,8 @@ fn main() {
 
         if !paused {
             update_cells(&mut cells);
+        } else {
+            framerate = 40.;
         }
 
         for row in 0..cells.len() {
@@ -77,8 +76,11 @@ fn main() {
                 match cells[row][col] {
                     State::Alive => {
                         let mut rect = RectangleShape::default();
-                        rect.set_size(Vector2f::new(8., 8.));
-                        rect.set_position(((col * 8) as f32, (row * 8) as f32));
+                        rect.set_size(Vector2f::new((CELL_SIZE - 2) as f32, (CELL_SIZE - 2) as f32));
+                        rect.set_position(((col * CELL_SIZE) as f32, (row * CELL_SIZE) as f32));
+                        rect.set_fill_color(Color::rgb(238, 244, 255));
+                        rect.set_outline_thickness(2.);
+                        rect.set_outline_color(Color::rgb(223, 236, 255));
                         window.draw(&rect);
                     }
                     State::Dead => {}
@@ -86,7 +88,7 @@ fn main() {
             }
         }
         window.display();
-        window.set_framerate_limit(10);
+        window.set_framerate_limit(framerate as u32);
     }
 }
 
