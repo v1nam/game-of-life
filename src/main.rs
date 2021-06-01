@@ -44,6 +44,11 @@ fn main() {
                     paused = !paused;
                     framerate = 14.;
                 }
+                Event::KeyPressed {
+                    code: Key::X, ..
+                } => {
+                    cells = [[State::Dead; WIN_W / CELL_SIZE]; WIN_H / CELL_SIZE];
+                }
                 Event::MouseWheelScrolled { delta, .. } => {
                     if !paused {
                         if framerate + delta > 12. && framerate + delta < 80. { framerate += delta; } 
